@@ -1,0 +1,844 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JC261/400 History Files</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .dark-theme {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border-color: #334155;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: var(--bg-primary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .logo img {
+            height: 32px;
+            width: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+            border-radius: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--primary);
+        }
+
+        /* Main Layout */
+        .main-container {
+            padding: 1.5rem;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        .files-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Filter Panel */
+        .filter-panel {
+            background-color: var(--bg-primary);
+            border-radius: 0.75rem;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+
+        .filter-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+            .btn-primary:hover {
+                background-color: var(--primary-dark);
+            }
+
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+            .btn-secondary:hover {
+                background-color: var(--bg-secondary);
+            }
+
+        .btn-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Content Area */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background-color: var(--bg-primary);
+            border-radius: 0.75rem;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .tab-content {
+            padding: 1.5rem;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Player Section */
+        .player-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .player-header {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .player-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .player-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            position: relative;
+            background-color: var(--bg-tertiary);
+            border-radius: 0.5rem;
+        }
+
+        .video-player {
+            max-width: 800px;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-text {
+            font-size: 1.125rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Gallery Section */
+        .gallery-section {
+            margin-top: 1.5rem;
+        }
+
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .gallery-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .gallery-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .gallery-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .file-card {
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .file-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow);
+        }
+
+        .file-card.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+
+        .file-thumbnail {
+            position: relative;
+            height: 150px;
+            overflow: hidden;
+            background-color: var(--bg-tertiary);
+            cursor: pointer;
+        }
+
+        .file-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .file-thumbnail .file-type {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+        }
+
+        .file-thumbnail .file-checkbox {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            accent-color: var(--primary);
+        }
+
+        .file-info {
+            padding: 0.75rem;
+        }
+
+        .file-name {
+            font-weight: 500;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* History Videos Section */
+        .history-section {
+            margin-top: 1.5rem;
+        }
+
+        .history-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-row {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Loading Animation */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 1rem;
+        }
+
+        .loading-text {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Image Viewer Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            animation: zoom 0.3s;
+        }
+
+        @@keyframes zoom {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #bbb;
+        }
+
+        /* Responsive Styles */
+        @@media (max-width: 1024px) {
+            .files-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-panel {
+                order: 2;
+            }
+            
+            .content-area {
+                order: 1;
+            }
+            
+            .history-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .header {
+                padding: 0.75rem 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .nav-link span {
+                display: none;
+            }
+            
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .gallery-content {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn-group .btn {
+                width: 100%;
+            }
+            
+            .gallery-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .gallery-actions .btn {
+                width: 100%;
+            }
+            
+            .tabs-header {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .logo-text {
+                display: none;
+            }
+            
+            .gallery-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-video"></i>
+            <span class="logo-text">JC261/JC400 History</span>
+        </div>
+        
+        <nav class="nav-links">
+            <a href="/live-stream" class="nav-link ">
+                <i class="fas fa-video"></i>
+                <span>Live Stream</span>
+            </a>
+            <a href="/dashcam-files" class="nav-link ">
+                <i class="fas fa-history"></i>
+                <span>JC261/JC400 History</span>
+            </a>
+            <a href="/history" class="nav-link ">
+                <i class="fas fa-folder"></i>
+                <span>JC371-History Streaming</span>
+            </a>
+
+        </nav>
+        
+        <div class="header-actions">
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="files-container">
+            <!-- Filter Panel -->
+            <aside class="filter-panel">
+                <h2 class="filter-title">
+                    <i class="fas fa-filter"></i>
+                    Filter Files
+                </h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Select Device</label>
+                    <select class="form-control mandatory" id="ddlVehicles">
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Select Day</label>
+                    <select class="form-control mandatory" id="ddlDay">
+                        <option selected value="Today">Today</option>
+                        <option value="Yesterday">Yesterday</option>
+                        <option value="This Week">This Week</option>
+                        <option value="Last Week">Last Week</option>
+                        <option value="Custom">Custom</option>
+                    </select>
+                </div>
+                
+                <div class="form-group DateDiv" style="display: none;">
+                    <label class="form-label">From Date</label>
+                    <input type="date" class="form-control" id="txtFromDate">
+                </div>
+                
+                <div class="form-group DateDiv" style="display: none;">
+                    <label class="form-label">To Date</label>
+                    <input type="date" class="form-control" id="txtToDate">
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary " id="btnSearch">
+                        <i class="fas fa-search"></i>              Search
+                    </button>
+                    <button class="btn btn-secondary" id="btnReset">
+                        <i class="fas fa-redo"></i>
+                        Reset
+                    </button>
+                </div>
+            </aside>
+            
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Tabs Container -->
+                <div class="tabs-container">
+                    <div class="tabs-header">
+                        <button class="tab-btn active" data-tab="videos">
+                            <i class="fas fa-video"></i>
+                            Captured & History Videos
+                        </button>
+                        <button class="tab-btn" data-tab="photos">
+                            <i class="fas fa-image"></i>
+                            Photos
+                        </button>
+                        <button class="tab-btn" data-tab="history">
+                            <i class="fas fa-history"></i>
+                            Get History Videos
+                        </button>
+                    </div>
+                    
+                    <div class="tab-content">
+                        <!-- Videos Tab -->
+                        <div class="tab-pane active" id="videos-tab">
+                            <div class="player-section">
+                                <div class="player-header">
+                                    <h2 class="player-title">Video Player</h2>
+                                    <p id="status"></p>
+
+                                </div>
+                                <div class="player-content">
+                                    <div class="empty-state" id="emptyVideoState">
+                                        <div class="empty-icon">
+                                            <i class="fas fa-film"></i>
+                                        </div>
+                                        <h3 class="empty-text">No video selected</h3>
+                                        <p>Select a video from the gallery to play</p>
+                                    </div>
+                                    
+                                    <div class="loading-state" id="loadingVideoState" style="display: none;">
+                                        <div class="loading-spinner"></div>
+                                        <p class="loading-text">Loading video...</p>
+                                    </div>
+                                    
+                                    <video class="video-player" id="player" controls style="display: none;"></video>
+                                </div>
+                            </div>
+                            
+                            <div class="gallery-section">
+                                <div class="gallery-header">
+                                    <h2 class="gallery-title">Video Gallery</h2>
+                                    <div class="gallery-actions">
+                                        <button class="btn btn-primary" id="btnPlayAllVideos" style="display:none">
+                                            <i class="fas fa-play"></i>
+                                            Play All
+                                        </button>
+                                        <button class="btn btn-primary" id="btnDownloadAllVideos" style="display:none">
+                                            <i class="fas fa-download"></i>
+                                            Download All
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="gallery-content" id="videosGallery">
+                                    <!-- Videos will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Photos Tab -->
+                        <div class="tab-pane" id="photos-tab">
+                            <div class="gallery-section">
+                                <div class="gallery-header">
+                                    <h2 class="gallery-title">Photo Gallery</h2>
+                                    <div class="gallery-actions">
+                                        <button class="btn btn-primary" id="btnDownloadAllPhotos" style="display:none">
+                                            <i class="fas fa-download"></i>
+                                            Download All
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="gallery-content" id="photosGallery">
+                                    <!-- Photos will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- History Tab -->
+                        <div class="tab-pane" id="history-tab">
+                            <div class="history-section">
+                                <h2 class="player-title">Get History Videos</h2>
+                                
+                                <div class="history-form">
+                                    <div class="form-group">
+                                        <label class="form-label">Select Device</label>
+                                        <select class="form-control mandatory_history" id="ddlVehiclesHistory">
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Select Camera</label>
+                                        <select class="form-control mandatory_history" id="ddlChannelsHistory" disabled>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Select Date</label>
+                                        <input type="date" class="form-control mandatory_history" id="txtDateHistory">
+                                    </div>
+                                    
+                                    <div class="form-group form-row">
+                                        <div style="flex: 1;">
+                                            <label class="form-label">From Time</label>
+                                            <input type="time" class="form-control mandatory_history" id="txtFromTimeHistory">
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <label class="form-label">To Time</label>
+                                            <input type="time" class="form-control mandatory_history" id="txtToTimeHistory">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <button class="btn btn-primary" id="btnGetHistoryVideos">
+                                            <i class="fas fa-history"></i> Get History Videos
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Viewer Modal -->
+    <div class="modal" id="imageViewer">
+        <span class="modal-close">&times;</span>
+        <img class="modal-content" id="fullImage">
+    </div>
+
+    
+</body>
+</html>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="~/js/dashcam-files.js?v=@DateTime.Now"></script>
